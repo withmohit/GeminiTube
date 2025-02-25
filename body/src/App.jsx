@@ -17,7 +17,7 @@ function App() {
     setMarkdown('');
 
     try {
-      const response = await axios.get('http://127.0.0.1:8000/summary');
+      const response = await axios.post('http://127.0.0.1:8000/summary', {url});
       setMarkdown(response.data.summary);
     } catch (err) {
       setError(

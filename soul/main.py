@@ -3,6 +3,10 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from google import genai
 from dotenv import load_dotenv
 import os
+import re
+
+# Regex pattern
+pattern = r"https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})"
 
 load_dotenv()
 
@@ -17,8 +21,12 @@ def get_transcript(video_id):
         return f"Error: {e}"
 
 # Example: Get transcript for a video
-def gen_summary():
-    video_id = "JRE8mNk9z_A"  # Replace with the actual YouTube video ID
+def gen_summary(url):
+    match=re.match(pattern, url)
+    if match is None:
+        return "Invalid URL. Please provide a valid YouTube video URL."
+    video_id = match.group(1)
+
     text = get_transcript(video_id)
 
     client = genai.Client(api_key=os.getenv("API_KEY"))
