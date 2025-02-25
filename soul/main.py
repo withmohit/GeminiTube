@@ -2,8 +2,11 @@
 from youtube_transcript_api import YouTubeTranscriptApi
 from google import genai
 from dotenv import load_dotenv
+from pytube import YouTube
 import os
 import re
+import isodate as iso
+import requests
 
 # Regex pattern
 pattern = r"https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})"
@@ -35,5 +38,31 @@ def gen_summary(url):
         model="gemini-2.0-flash",
         contents=f"summarize the text good readable format with bulletpoints and important keyword highlited: {text}",
     )
-    return response.text
+    return [response.text,get_video_details(video_id)]
+
+def get_video_details(video_id):
+    url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id={video_id}&key={os.getenv('GOOGLE_YOUTUBE_API_KEY')}"
+    try:
+        response = requests.get(url)
+        data = response.json()
+
+        if "items" not in data or not data["items"]:
+            return {"Error": "Video not found"}
+
+        video = data["items"][0]
+        snippet = video["snippet"]
+        content_details = video["contentDetails"]
+
+        video_details = {
+            "title": snippet["title"],
+            "channelName": snippet["channelTitle"],
+            "duration": content_details["duration"],  # ISO 8601 format
+            "thumbnail": snippet["thumbnails"]["high"]["url"]
+        }
+        parsed_duration = iso.parse_duration(video_details["duration"])
+        video_details["duration"] = str(parsed_duration)
+        
+        return video_details
+    except Exception as e:
+        return {"Error": str(e)}
 

@@ -1,13 +1,14 @@
 from fastapi import FastAPI
-from main import gen_summary
+from main import gen_summary,get_video_details
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
 
 class url_type(BaseModel):
     url:str
 
 #cors policy allow all
-from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -22,5 +23,4 @@ def read_root():
 
 @app.post("/summary")
 def read_summary(data:url_type):
-
     return {"summary": gen_summary(data.url)}

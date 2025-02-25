@@ -9,7 +9,7 @@ function App() {
   const [markdown, setMarkdown] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const [videoInfo, setVideoInfo] = useState(null);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -18,7 +18,10 @@ function App() {
 
     try {
       const response = await axios.post('http://127.0.0.1:8000/summary', {url});
-      setMarkdown(response.data.summary);
+      const { summary } = response.data;
+      setMarkdown(summary[0]);
+      setVideoInfo(summary[1]);
+      
     } catch (err) {
       setError(
         axios.isAxiosError(err)
@@ -31,6 +34,7 @@ function App() {
   };
 
   return (
+    <>
     <div className="container">
       <form onSubmit={handleSubmit} className="input-form">
         <div className="input-group">
@@ -48,6 +52,20 @@ function App() {
           Get Summary
         </button>
       </form>
+    <div className='detailCard'>
+    {videoInfo && (
+          <div className="video-card">
+            <div className="thumbnail-container">
+              <img src={videoInfo.thumbnail} alt="Video thumbnail" className="video-thumbnail" />
+              <span className="video-duration">{videoInfo.duration}</span>
+            </div>
+            <div className="video-info">
+              <h3 className="video-title">{videoInfo.title}</h3>
+              <p className="channel-name">{videoInfo.channelName}</p>
+            </div>
+          </div>
+        )}
+    </div>
 
       {loading && (
         <div className="loading">
@@ -68,6 +86,7 @@ function App() {
         </div>
       )}
     </div>
+    </>
   );
 }
 
