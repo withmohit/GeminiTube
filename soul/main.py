@@ -1,0 +1,31 @@
+# from transformers import pipeline
+from youtube_transcript_api import YouTubeTranscriptApi
+from google import genai
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+# Function to fetch transcript
+def get_transcript(video_id):
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        # Combine all text parts into a single string
+        transcript_text = " ".join([t['text'] for t in transcript])
+        return transcript_text
+    except Exception as e:
+        return f"Error: {e}"
+
+# Example: Get transcript for a video
+def gen_summary():
+    video_id = "JRE8mNk9z_A"  # Replace with the actual YouTube video ID
+    text = get_transcript(video_id)
+
+    client = genai.Client(api_key=os.getenv("API_KEY"))
+
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=f"summarize the text good readable format with bulletpoints and important keyword highlited: {text}",
+    )
+    return response.text
+
