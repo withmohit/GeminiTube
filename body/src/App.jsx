@@ -39,7 +39,7 @@ function App() {
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Enter markdown file URL"
+            placeholder="Enter youtube URL"
             required
             className="url-input"
           />
@@ -52,7 +52,7 @@ function App() {
       {loading && (
         <div className="loading">
           <FileText size={24} style={{ margin: '0 auto 1rem' }} />
-          <p>Loading markdown content...</p>
+          <p>Loading your summarize content...</p>
         </div>
       )}
 
